@@ -91,6 +91,18 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean, setIsLogge
             >
               Contact
             </a>
+            {!isLoggedIn ? (
+              <button
+                onClick={() => setIsLoginOpen(true)}
+                className="py-3 px-3 text-white bg-blue-500 hover:bg-blue-600 transition rounded-lg shadow-lg"
+              >
+                Login/Signup
+              </button>
+            ) : (
+              <button onClick={handleNavigateToUser} className="rounded-full hover:ring-2 hover:ring-blue-500 p-1 transition">
+                <UserCircle size={36} className="text-blue-600" />
+              </button>
+            )}
           </div>
         )}
       </nav>
