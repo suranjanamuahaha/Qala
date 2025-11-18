@@ -1,6 +1,4 @@
-import React from "react";
 import Slider from "react-slick";
-import { useNavigate } from 'react-router-dom';
 
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -14,17 +12,6 @@ const volunteers = [
   // add more
 ];
 
-
-const sliderSettings = {
-  dots: true,
-  infinite: true,
-  speed: 800,
-  slidesToShow: 1,
-  slidesToScroll: 1,
-  autoplay: true,
-  autoplaySpeed: 4000,
-  arrows: true,
-};
 
 const carouselSettings = {
   dots: true,
