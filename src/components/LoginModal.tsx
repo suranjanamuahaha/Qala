@@ -1,7 +1,7 @@
 // src/components/LoginModal.tsx
 import React, { useState } from "react";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-import { app } from "../firebase";
+import { app } from "../firebase.js";
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -18,7 +18,10 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
   const [password, setPassword] = useState("");
 
   const createUser = () => {
-    createUserWithEmailAndPassword(auth, email, password).then((value) => alert("User Successfully Created"));
+    createUserWithEmailAndPassword(auth, email, password).then((_value) => alert("User Successfully Created")).catch((err) => {
+      console.error("ERROR:", err);
+      alert(err.message);
+    });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
