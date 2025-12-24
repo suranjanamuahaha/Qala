@@ -1,4 +1,9 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Slider from "react-slick";
+import { getFirestore, collection, getDocs, query, where } from "firebase/firestore";
+import { app } from "../firebase";
+import LoginModal from "./LoginModal"
 
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -12,6 +17,11 @@ const volunteers = [
   // add more
 ];
 
+type ArtistCard = {
+  id: string;
+  name: string;
+  avatarUrl?: string;
+};
 
 const carouselSettings = {
   dots: true,
@@ -34,6 +44,41 @@ const carouselSettings = {
 };
 
 const LandingPage = () => {
+  const [artists, setArtists] = useState<ArtistCard[]>([]);
+  const [loadingArtists, setLoadingArtists] = useState(true);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const navigate = useNavigate();
+
+  // Fetch artist accounts from Firestore
+  useEffect(() => {
+    const fetchArtists = async () => {
+      try {
+        const db = getFirestore(app);
+        const usersRef = collection(db, "users");
+        const q = query(usersRef, where("role", "==", "artist"));
+        const snap = await getDocs(q);
+
+        const list: ArtistCard[] = snap.docs.map((doc) => {
+          const data = doc.data() as any;
+          return {
+            id: doc.id,
+            name: data.displayName || data.email || "Unnamed Artist",
+            avatarUrl: data.avatarUrl || data.photoURL || "/assets/default-avatar.jpg",
+          };
+        });
+
+        setArtists(list);
+      } catch (err) {
+        console.error("Failed to load artists", err);
+        setArtists([]);
+      } finally {
+        setLoadingArtists(false);
+      }
+    };
+
+    fetchArtists();
+  }, []);
+
   return (
     <div className="min-h-screen bg-white-50 text-gray-900">
 
@@ -53,7 +98,7 @@ const LandingPage = () => {
             Your gateway to discovering talented artists and commissioning unique creations.
           </p>
           <div className="space-x-4">
-            <button className="px-6 py-3 border font-semibold border-blue-800 bg-blue-800 text-white rounded-md hover:bg-blue-900 transition shadow-lg drop-shadow-lg">
+            <button onClick={() => setShowLoginModal(true)} className="px-6 py-3 border font-semibold border-blue-800 bg-blue-800 text-white rounded-md hover:bg-blue-900 transition shadow-lg drop-shadow-lg">
               Join as Artist
             </button>
             <button className="px-6 py-3 border font-semibold border-blue-900 text-blue-900 rounded-md bg-white/30 hover:bg-pink-50 transition shadow-lg drop-shadow-lg">
@@ -69,7 +114,7 @@ const LandingPage = () => {
           {/* Left Image */}
           <div className="w-full h-full">
             <img
-              src="/assets/ourmission1.jpg" // replace with your image
+              src="/assets/ourmission1.jpg"
               alt="Left decorative art"
               className="w-full h-full object-cover opacity-80"
             />
@@ -86,7 +131,7 @@ const LandingPage = () => {
           {/* Right Image */}
           <div className="w-full h-full">
             <img
-              src="/assets/ourmission2.jpg" // replace with your image
+              src="/assets/ourmission2.jpg"
               alt="Right decorative art"
               className="w-full h-full object-cover opacity-80"
             />
@@ -116,33 +161,51 @@ const LandingPage = () => {
       {/* Discover Our Collections */}
       <section className="py-20 px-6 w-full bg-blue-100 text-center">
         <h2 className="text-3xl font-semibold mb-8">Discover Our Collections</h2>
-        {/* <div className="max-w-full mx-auto grid sm:grid-cols-3 gap-8 text-left"> */}
         <Slider {...carouselSettings}>
           {volunteers.map((v) => (
             <div key={v.id} className="p-4">
               <div className="bg-white rounded-xl shadow-md overflow-hidden">
                 <img src={v.image} alt={v.name} className="w-full h-64 object-cover" />
-                {/* <h3 className="font-semibold text-lg">{v.name}</h3> */}
               </div>
             </div>
           ))}
         </Slider>
-        {/* </div> */}
       </section>
 
-      {/* Volunteers */}
+      {/* Verified Artists – from Firestore */}
       <section className="py-16 px-6 bg-blue-100">
         <h2 className="text-3xl font-bold text-center mb-8">Our Verified Artists</h2>
-        <Slider {...carouselSettings}>
-          {volunteers.map((v) => (
-            <div key={v.id} className="p-4">
-              <div className="bg-white rounded-lg shadow-md p-6 text-center">
-                <img src={v.image} alt={v.name} className="h-24 w-24 mx-auto rounded-full object-cover mb-4" />
-                <h3 className="font-semibold text-lg">{v.name}</h3>
+
+        {loadingArtists && (
+          <p className="text-center text-gray-500">Loading artists...</p>
+        )}
+
+        {!loadingArtists && artists.length === 0 && (
+          <p className="text-center text-gray-500">
+            No artist profiles yet. Check back soon!
+          </p>
+        )}
+
+        {artists.length > 0 && (
+          <Slider {...carouselSettings}>
+            {artists.map((artist) => (
+              <div key={artist.id} className="p-4">
+                <button
+                  type="button"
+                  onClick={() => navigate(`/artist/${artist.id}`)}
+                  className="w-full bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg transition"
+                >
+                  <img
+                    src={artist.avatarUrl}
+                    alt={artist.name}
+                    className="h-24 w-24 mx-auto rounded-full object-cover mb-4"
+                  />
+                  <h3 className="font-semibold text-lg">{artist.name}</h3>
+                </button>
               </div>
-            </div>
-          ))}
-        </Slider>
+            ))}
+          </Slider>
+        )}
       </section>
 
       {/* Contact Us Section */}
@@ -196,7 +259,6 @@ const LandingPage = () => {
         </form>
       </section>
 
-
       {/* Footer */}
       <footer className="bg-gradient-to-b bg-blue-900/50 shadow-inner py-10 px-6 text-center md:text-left">
         <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-8 items-center">
@@ -212,7 +274,7 @@ const LandingPage = () => {
           <div className="flex flex-col items-center">
             <h4 className="font-semibold text-blue-800 mb-3">Quick Links</h4>
             <ul className="space-y-2 text-gray-700 text-sm">
-              <li><a href="/" className=" text-white hover:text-blue-600 transition">Home</a></li>
+              <li><a href="/" className="text-white hover:text-blue-600 transition">Home</a></li>
               <li><a href="/user" className="text-white hover:text-blue-600 transition">Artists</a></li>
               <li><a href="#contact" className="text-white hover:text-blue-600 transition">Contact Us</a></li>
               <li><a href="#" className="text-white hover:text-blue-600 transition">About</a></li>
@@ -241,6 +303,12 @@ const LandingPage = () => {
           &copy; {new Date().getFullYear()} Qala. All rights reserved.
         </div>
       </footer>
+      <LoginModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        onLoginSuccess={() => setShowLoginModal(false)}
+      />
+
     </div>
   );
 };

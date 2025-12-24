@@ -12,7 +12,7 @@ const UserProfile: React.FC = () => {
         className="bg-white shadow-xl rounded-2xl p-8 max-w-3xl w-full text-center"
       >
         <img
-          src="./assets/artist-image.jpg"
+          src="/assets/artist-image.jpg"
           alt="Artist Profile"
           className="w-36 h-36 rounded-full mx-auto object-cover shadow-md"
         />
@@ -24,7 +24,7 @@ const UserProfile: React.FC = () => {
           Aiden is a passionate digital artist who blends realism with fantasy.
           His works often explore human emotions, surrealism, and nature-inspired
           visual storytelling.
-        </p>
+        </p>3
 
         <div className="mt-5 flex justify-center gap-4">
           <a
@@ -56,12 +56,12 @@ const UserProfile: React.FC = () => {
         className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-10 max-w-5xl w-full"
       >
         {[
-          "./assets/art1.jpg",
-          "./assets/art2.jpg",
-          "./assets/art3.jpg",
-          "./assets/art4.jpg",
-          "./assets/art5.jpg",
-          "./assets/art6.jpg",
+          "/assets/art1.jpg",
+          "/assets/art2.jpg",
+          "/assets/art3.jpg",
+          "/assets/art4.jpg",
+          "/assets/art5.jpg",
+          "/assets/art6.jpg",
         ].map((img, i) => (
           <motion.div
             key={i}
