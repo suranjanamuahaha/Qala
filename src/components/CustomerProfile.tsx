@@ -1,4 +1,3 @@
-// src/pages/UserProfile.tsx
 import React, { useEffect, useState } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { app } from "../firebase";
@@ -24,7 +23,6 @@ type UserProfileData = {
 
 const CustomerProfile: React.FC = () => {
   const [uid, setUid] = useState<string | null>(null);
-  const [profile, setProfile] = useState<UserProfileData | null>(null);
   const [form, setForm] = useState<UserProfileData>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -37,7 +35,6 @@ const CustomerProfile: React.FC = () => {
         setUid(user.uid);
       } else {
         setUid(null);
-        setProfile(null);
         setForm({});
       }
     });
@@ -68,7 +65,6 @@ const CustomerProfile: React.FC = () => {
           phone: data?.phone ?? "",
           avatarUrl: data?.avatarUrl ?? "",
         };
-        setProfile(merged);
         setForm(merged);
       } catch (err: any) {
         console.error(err);
@@ -93,7 +89,6 @@ const CustomerProfile: React.FC = () => {
       setSaving(true);
       setError(null);
       await saveUserProfile(uid, form); // merge into Firestore
-      setProfile(form);
     } catch (err: any) {
       console.error(err);
       setError(err?.message || "Failed to save profile");
@@ -102,7 +97,7 @@ const CustomerProfile: React.FC = () => {
     }
   };
 
-  // For now, just a placeholder avatar. Later we can add upload.
+  // Placeholder avatar
   const avatarInitial =
     form.displayName && form.displayName.trim().length > 0
       ? form.displayName.trim()[0].toUpperCase()
@@ -137,28 +132,27 @@ const CustomerProfile: React.FC = () => {
       )}
 
       <div className="bg-white shadow-md rounded-2xl p-6 space-y-6">
-        {/* Top section: avatar + basic info */}
+        {/* Avatar + basic info */}
         <div className="flex items-center gap-4">
           <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center text-2xl font-bold text-blue-700">
             {avatarInitial}
           </div>
           <div className="flex-1">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
-              <div className="flex-1">
-                <label className="block text-xs font-medium text-gray-500 mb-1">
-                  Name
-                </label>
-                <input
-                  type="text"
-                  value={form.displayName ?? ""}
-                  onChange={handleChange("displayName")}
-                  className="w-full border rounded-lg px-3 py-2 text-sm"
-                  placeholder="Your name"
-                />
-              </div>
-            </div>
+            <label className="block text-xs font-medium text-gray-500 mb-1">
+              Name
+            </label>
+            <input
+              type="text"
+              value={form.displayName ?? ""}
+              onChange={handleChange("displayName")}
+              className="w-full border rounded-lg px-3 py-2 text-sm"
+              placeholder="Your name"
+            />
             <p className="text-xs text-gray-500 mt-2">
-              Role: <span className="font-medium">{form.role ?? "customer"}</span>
+              Role:{" "}
+              <span className="font-medium">
+                {form.role ?? "customer"}
+              </span>
             </p>
             {form.email && (
               <p className="text-xs text-gray-500">
@@ -184,91 +178,60 @@ const CustomerProfile: React.FC = () => {
 
         {/* Address */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="sm:col-span-2">
-            <label className="block text-xs font-medium text-gray-500 mb-1">
-              Address line 1
-            </label>
-            <input
-              type="text"
-              value={form.addressLine1 ?? ""}
-              onChange={handleChange("addressLine1")}
-              className="w-full border rounded-lg px-3 py-2 text-sm"
-              placeholder="Street, building, etc."
-            />
-          </div>
-          <div className="sm:col-span-2">
-            <label className="block text-xs font-medium text-gray-500 mb-1">
-              Address line 2 (optional)
-            </label>
-            <input
-              type="text"
-              value={form.addressLine2 ?? ""}
-              onChange={handleChange("addressLine2")}
-              className="w-full border rounded-lg px-3 py-2 text-sm"
-              placeholder="Apartment, landmark, etc."
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1">
-              City
-            </label>
-            <input
-              type="text"
-              value={form.city ?? ""}
-              onChange={handleChange("city")}
-              className="w-full border rounded-lg px-3 py-2 text-sm"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1">
-              State
-            </label>
-            <input
-              type="text"
-              value={form.state ?? ""}
-              onChange={handleChange("state")}
-              className="w-full border rounded-lg px-3 py-2 text-sm"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1">
-              Postal code
-            </label>
-            <input
-              type="text"
-              value={form.postalCode ?? ""}
-              onChange={handleChange("postalCode")}
-              className="w-full border rounded-lg px-3 py-2 text-sm"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1">
-              Country
-            </label>
-            <input
-              type="text"
-              value={form.country ?? ""}
-              onChange={handleChange("country")}
-              className="w-full border rounded-lg px-3 py-2 text-sm"
-            />
-          </div>
-        </div>
-
-        {/* Phone */}
-        <div>
-          <label className="block text-xs font-medium text-gray-500 mb-1">
-            Phone
-          </label>
           <input
             type="text"
-            value={form.phone ?? ""}
-            onChange={handleChange("phone")}
-            className="w-full border rounded-lg px-3 py-2 text-sm"
-            placeholder="Contact number"
+            value={form.addressLine1 ?? ""}
+            onChange={handleChange("addressLine1")}
+            className="sm:col-span-2 border rounded-lg px-3 py-2 text-sm"
+            placeholder="Address line 1"
+          />
+          <input
+            type="text"
+            value={form.addressLine2 ?? ""}
+            onChange={handleChange("addressLine2")}
+            className="sm:col-span-2 border rounded-lg px-3 py-2 text-sm"
+            placeholder="Address line 2 (optional)"
+          />
+          <input
+            type="text"
+            value={form.city ?? ""}
+            onChange={handleChange("city")}
+            className="border rounded-lg px-3 py-2 text-sm"
+            placeholder="City"
+          />
+          <input
+            type="text"
+            value={form.state ?? ""}
+            onChange={handleChange("state")}
+            className="border rounded-lg px-3 py-2 text-sm"
+            placeholder="State"
+          />
+          <input
+            type="text"
+            value={form.postalCode ?? ""}
+            onChange={handleChange("postalCode")}
+            className="border rounded-lg px-3 py-2 text-sm"
+            placeholder="Postal code"
+          />
+          <input
+            type="text"
+            value={form.country ?? ""}
+            onChange={handleChange("country")}
+            className="border rounded-lg px-3 py-2 text-sm"
+            placeholder="Country"
           />
         </div>
 
-        {/* Save button */}
+        {/* Phone */}
+        <input
+          type="text"
+          value={form.phone ?? ""}
+          onChange={handleChange("phone")}
+          className="w-full border rounded-lg px-3 py-2 text-sm"
+          placeholder="Phone number"
+        />
+
+        {/* Save */}
         <div className="flex justify-end">
           <button
             onClick={handleSave}
